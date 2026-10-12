@@ -32,12 +32,17 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Callable
 
-import numpy as np
+# Allow `python bench/run_bench.py` on a fresh clone with no editable install.
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if _SRC.is_dir() and str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+import numpy as np  # noqa: E402
 
 from certiscale.cite import CITECertifier, CiteConfig
 from certiscale.flagship import CertiScaleConfig, CertiScaleEngine
