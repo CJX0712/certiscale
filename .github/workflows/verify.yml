@@ -1,0 +1,37 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  invariants:
+    name: invariant gates (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: One-shot invariant gates
+        run: python verify.py
+
+      - name: Full invariant suite
+        run: python -m pytest tests/ -q
+
+      - name: Benchmark smoke test
+        run: python bench/run_bench.py --seeds 1 --problems 6 --vce-batch 8
